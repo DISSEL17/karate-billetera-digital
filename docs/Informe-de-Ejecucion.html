@@ -1,0 +1,377 @@
+<!doctype html><html lang="es"><head><meta charset="utf-8">
+<title>Informe de Ejecución - Billetera Digital</title>
+<style>
+@page { size: A4; margin: 16mm 14mm; }
+body { font-family: "Segoe UI", Arial, sans-serif; font-size: 10pt; color: #1e293b; line-height: 1.45; }
+h1 { font-size: 22pt; margin: 0 0 4px; color: #0c4a6e; }
+h2 { font-size: 14pt; color: #0c4a6e; border-bottom: 2px solid #0ea5e9; padding-bottom: 3px; margin-top: 22px; }
+h3 { font-size: 11.5pt; margin: 16px 0 6px; }
+table { width: 100%; border-collapse: collapse; margin: 6px 0 10px; }
+th, td { border: 1px solid #cbd5e1; padding: 5px 7px; text-align: left; vertical-align: top; }
+th { background: #e0f2fe; }
+.pass { color: #15803d; font-weight: 700; } .fail { color: #b91c1c; font-weight: 700; }
+.cover { height: 245mm; display: flex; flex-direction: column; justify-content: center; page-break-after: always; }
+.cover .sub { font-size: 13pt; color: #475569; margin-bottom: 28px; }
+.cover table td:first-child { width: 32%; font-weight: 600; background: #f8fafc; }
+.kpis { display: flex; gap: 10px; margin: 10px 0; }
+.kpi { flex: 1; border: 1px solid #cbd5e1; border-radius: 8px; padding: 8px; text-align: center; }
+.kpi b { display: block; font-size: 18pt; }
+.badge { display: inline-block; padding: 2px 10px; border-radius: 12px; color: #fff; font-weight: 700; }
+.ok { background: #15803d; } .ko { background: #b91c1c; }
+pre { background: #0f172a; color: #e2e8f0; padding: 7px 9px; border-radius: 6px; font-size: 7.6pt;
+      white-space: pre-wrap; word-break: break-all; margin: 3px 0; }
+.call { border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px 8px; margin: 6px 0; page-break-inside: avoid; }
+.call .hdr { font-family: Consolas, monospace; font-size: 8.5pt; font-weight: 700; }
+.lbl { font-size: 7.5pt; text-transform: uppercase; color: #64748b; margin-top: 4px; }
+.scen { page-break-before: always; }
+img { width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; margin: 6px 0; }
+.sev-Alta { color: #b91c1c; font-weight: 700; } .sev-Media { color: #c2410c; font-weight: 700; }
+.sev-Baja { color: #a16207; font-weight: 700; }
+code { background: #f1f5f9; padding: 0 3px; border-radius: 3px; font-size: 8.8pt; }
+</style></head><body><section class="cover">
+<h1>Informe de Ejecución de Pruebas</h1>
+<div class="sub">Automatización de APIs – Billetera Digital</div>
+<table>
+<tr><td>Proyecto</td><td>Evaluación de Automatización de APIs – Billetera Digital</td></tr>
+<tr><td>Sistema bajo prueba</td><td>http://134.209.211.10:5173/ (microservicios Auth 4001, Wallet 4002, Transaction 4003, Admin 4004)</td></tr>
+<tr><td>Herramientas</td><td>Karate Framework 1.4.1 · JUnit 5 · Maven · Java 17</td></tr>
+<tr><td>Tipo de prueba</td><td>Regresión funcional E2E de API</td></tr>
+<tr><td>Modo de ejecución</td><td>Secuencial, 1 hilo (parallel(1))</td></tr>
+<tr><td>Entorno</td><td>qa</td></tr>
+<tr><td>Fecha de ejecución</td><td>2026-10-28 07:37:56 p. m.</td></tr>
+<tr><td>Elaborado por</td><td>Jonathan Castañeda – QA Automation Engineer</td></tr>
+<tr><td>Resultado</td><td><span class="badge ok">APROBADO</span></td></tr>
+</table></section><h2>1. Resultado de ejecución – Resumen</h2>
+<div class="kpis">
+<div class="kpi"><b>2</b>Features</div>
+<div class="kpi"><b>8</b>Escenarios</div>
+<div class="kpi"><b class="pass">8</b>Aprobados</div>
+<div class="kpi"><b class="pass">0</b>Fallidos</div>
+<div class="kpi"><b>100%</b>Éxito</div>
+<div class="kpi"><b>15.8s</b>Duración</div>
+</div>
+<p>El flujo <b>Registro → Transferencia → Validación en Receptor → Auditoría del Administrador</b> se ejecutó de
+punta a punta. Los datos se comparten entre escenarios mediante un almacén global definido en
+<code>karate-config.js</code>, por lo que la suite corre en un solo hilo y en orden.</p>
+<h3>Datos de la ejecución</h3>
+<table>
+<tr><th>Dato</th><th>Valor</th></tr>
+<tr><td>Emisor (teléfono / id)</td><td>959477034 / u_1793234259588</td></tr>
+<tr><td>Receptor (teléfono / id)</td><td>959491530 / u_1793234259834</td></tr>
+<tr><td>Saldo asignado a cada usuario</td><td>2,000.00 USD</td></tr>
+<tr><td>Monto transferido / nota</td><td>450.00 USD / "Pago de Servicios"</td></tr>
+<tr><td>transactionId</td><td>tx_1793234263209</td></tr>
+<tr><td>Código de referencia</td><td>REF-449329</td></tr>
+<tr><td>Saldo final Emisor</td><td>1,550.00 USD (2,000.00 − 450.00)</td></tr>
+<tr><td>Saldo final Receptor</td><td>2,450.00 USD (2,000.00 + 450.00)</td></tr>
+</table>
+<h3>Reporte de Karate (resumen)</h3>
+<img src="evidencias/01-karate-summary.png" alt="Resumen Karate"><h2>2. Resultado por escenario</h2><table>
+<tr><th>#</th><th>Feature</th><th>Escenario</th><th>Validaciones</th><th>Tiempo</th><th>Estado</th></tr><tr><td>1</td><td>regression.feature</td><td>Escenario 1 - Registro de usuarios Emisor y Receptor con saldo asignado</td><td>Registro 201 de Emisor y Receptor con teléfono aleatorio único; esquema del usuario con matchers (#string, #regex, #array); <b>negativo</b>: registro duplicado → 409 AUTH_006; abono de 2000.00 vía Admin; saldo consultado con el token de cada usuario = saldo asignado.</td><td>3.74s</td><td><span class="pass">PASS</span></td></tr><tr><td>2</td><td>regression.feature</td><td>Escenario 2 - Transferencia del Emisor al Receptor por 450.00</td><td>Login del Emisor y captura del token Bearer; transferencia de 450.00 con nota "Pago de Servicios" → 200; tabla de aserción (status COMPLETED, mensaje, transactionId, referenceCode); saldo Emisor = saldo inicial − 450.00.</td><td>0.80s</td><td><span class="pass">PASS</span></td></tr><tr><td>3</td><td>regression.feature</td><td>Escenario 3 - Validacion del saldo y del historial en el Receptor</td><td>Login del Receptor; saldo = saldo inicial + 450.00; el historial contiene el código de la transacción como INCOME de 450.00 con la contraparte y la nota correctas.</td><td>0.69s</td><td><span class="pass">PASS</span></td></tr><tr><td>4</td><td>admin.feature</td><td>Login de administrador con credenciales validas e invalidas</td><td>Login admin 200 (token Bearer, expiresIn 14400); credenciales inválidas → 401 AUTH_003.</td><td>0.44s</td><td><span class="pass">PASS</span></td></tr><tr><td>5</td><td>admin.feature</td><td>El administrador valida la transaccion en la auditoria global</td><td>La auditoría global contiene la referencia con 2 asientos: débito EXPENSE del Emisor y crédito INCOME del Receptor por 450.00.</td><td>1.52s</td><td><span class="pass">PASS</span></td></tr><tr><td>6</td><td>admin.feature</td><td>El administrador confirma los saldos finales de Emisor y Receptor</td><td>GET /admin/v1/users: Emisor y Receptor ACTIVE con los saldos finales esperados.</td><td>7.68s</td><td><span class="pass">PASS</span></td></tr><tr><td>7</td><td>admin.feature</td><td>Acceso a la auditoria sin permisos de administrador - sin token</td><td>Sin token → 401 ADM_001.</td><td>0.44s</td><td><span class="pass">PASS</span></td></tr><tr><td>8</td><td>admin.feature</td><td>Acceso a la auditoria sin permisos de administrador - token de usuario sin rol</td><td>Token de usuario sin rol admin → 403 ADM_002.</td><td>0.44s</td><td><span class="pass">PASS</span></td></tr></table><h2 class="scen">3. Evidencia de la ejecución por escenario</h2><p>Peticiones y respuestas HTTP registradas por Karate durante la ejecución (los tokens se muestran truncados).</p><h3 style="page-break-before:auto">1. Escenario 1 - Registro de usuarios Emisor y Receptor con saldo asignado <span class="badge ok">PASS</span></h3><p>Registro 201 de Emisor y Receptor con teléfono aleatorio único; esquema del usuario con matchers (#string, #regex, #array); <b>negativo</b>: registro duplicado → 409 AUTH_006; abono de 2000.00 vía Admin; saldo consultado con el token de cada usuario = saldo asignado.</p><div class="call"><div class="hdr">POST http://134.209.211.10:4001/auth/v1/register → <span class="pass">201</span> · 277 ms</div><div class="lbl">Request</div><pre>{
+  &quot;phone&quot;: &quot;959477034&quot;,
+  &quot;fullName&quot;: &quot;Emisor QA Karate&quot;,
+  &quot;pin&quot;: &quot;123456&quot;,
+  &quot;email&quot;: &quot;emisor.959477034@qa.test&quot;
+}</pre><div class="lbl">Response</div><pre>{
+  &quot;message&quot;: &quot;Usuario creado exitosamente&quot;,
+  &quot;user&quot;: {
+    &quot;id&quot;: &quot;u_1793234259588&quot;,
+    &quot;phone&quot;: &quot;959477034&quot;,
+    &quot;name&quot;: &quot;Emisor QA Karate&quot;,
+    &quot;email&quot;: &quot;emisor.959477034@qa.test&quot;,
+    &quot;pin&quot;: &quot;123456&quot;,
+    &quot;status&quot;: &quot;ACTIVE&quot;,
+    &quot;contacts&quot;: []
+  }
+}</pre></div><div class="call"><div class="hdr">POST http://134.209.211.10:4001/auth/v1/register → <span class="pass">201</span> · 230 ms</div><div class="lbl">Request</div><pre>{
+  &quot;phone&quot;: &quot;959491530&quot;,
+  &quot;fullName&quot;: &quot;Receptor QA Karate&quot;,
+  &quot;pin&quot;: &quot;123456&quot;,
+  &quot;email&quot;: &quot;receptor.959491530@qa.test&quot;
+}</pre><div class="lbl">Response</div><pre>{
+  &quot;message&quot;: &quot;Usuario creado exitosamente&quot;,
+  &quot;user&quot;: {
+    &quot;id&quot;: &quot;u_1793234259834&quot;,
+    &quot;phone&quot;: &quot;959491530&quot;,
+    &quot;name&quot;: &quot;Receptor QA Karate&quot;,
+    &quot;email&quot;: &quot;receptor.959491530@qa.test&quot;,
+    &quot;pin&quot;: &quot;123456&quot;,
+    &quot;status&quot;: &quot;ACTIVE&quot;,
+    &quot;contacts&quot;: []
+  }
+}</pre></div><div class="call"><div class="hdr">POST http://134.209.211.10:4001/auth/v1/register → <span class="fail">409</span> · 213 ms</div><div class="lbl">Request</div><pre>{
+  &quot;phone&quot;: &quot;959477034&quot;,
+  &quot;fullName&quot;: &quot;Emisor Duplicado&quot;,
+  &quot;pin&quot;: &quot;123456&quot;
+}</pre><div class="lbl">Response</div><pre>{
+  &quot;code&quot;: &quot;AUTH_006&quot;,
+  &quot;message&quot;: &quot;User already exists&quot;
+}</pre></div><div class="call"><div class="hdr">POST http://134.209.211.10:4004/admin/v1/login → <span class="pass">200</span> · 214 ms</div><div class="lbl">Request</div><pre>{
+  &quot;username&quot;: &quot;admin&quot;,
+  &quot;password&quot;: &quot;********&quot;
+}</pre><div class="lbl">Response</div><pre>{
+  &quot;token&quot;: &quot;eyJhbGciOiJI…&quot;,
+  &quot;type&quot;: &quot;Bearer&quot;,
+  &quot;expiresIn&quot;: 14400,
+  &quot;message&quot;: &quot;Usa este token en el Header &#x27;Authorization&#x27;&quot;
+}</pre></div><div class="call"><div class="hdr">POST http://134.209.211.10:4004/admin/v1/balance → <span class="pass">200</span> · 252 ms</div><div class="lbl">Request</div><pre>{
+  &quot;userId&quot;: &quot;u_1793234259588&quot;,
+  &quot;amount&quot;: 2000,
+  &quot;type&quot;: &quot;CREDIT&quot;,
+  &quot;description&quot;: &quot;Saldo inicial QA&quot;
+}</pre><div class="lbl">Response</div><pre>{
+  &quot;success&quot;: true,
+  &quot;newBalance&quot;: 2000
+}</pre></div><div class="call"><div class="hdr">POST http://134.209.211.10:4004/admin/v1/balance → <span class="pass">200</span> · 1123 ms</div><div class="lbl">Request</div><pre>{
+  &quot;userId&quot;: &quot;u_1793234259834&quot;,
+  &quot;amount&quot;: 2000,
+  &quot;type&quot;: &quot;CREDIT&quot;,
+  &quot;description&quot;: &quot;Saldo inicial QA&quot;
+}</pre><div class="lbl">Response</div><pre>{
+  &quot;success&quot;: true,
+  &quot;newBalance&quot;: 2000
+}</pre></div><div class="call"><div class="hdr">POST http://134.209.211.10:4001/auth/v1/login → <span class="pass">200</span> · 225 ms</div><div class="lbl">Request</div><pre>{
+  &quot;phone&quot;: &quot;959477034&quot;,
+  &quot;pin&quot;: &quot;123456&quot;
+}</pre><div class="lbl">Response</div><pre>{
+  &quot;token&quot;: &quot;eyJhbGciOiJI…&quot;,
+  &quot;expiresIn&quot;: 3600,
+  &quot;user&quot;: {
+    &quot;id&quot;: &quot;u_1793234259588&quot;,
+    &quot;phone&quot;: &quot;959477034&quot;,
+    &quot;name&quot;: &quot;Emisor QA Karate&quot;,
+    &quot;email&quot;: &quot;emisor.959477034@qa.test&quot;,
+    &quot;pin&quot;: &quot;123456&quot;,
+    &quot;status&quot;: &quot;ACTIVE&quot;,
+    &quot;contacts&quot;: []
+  }
+}</pre></div><div class="call"><div class="hdr">GET http://134.209.211.10:4002/wallet/v1/balance → <span class="pass">200</span> · 216 ms</div><div class="lbl">Response</div><pre>{
+  &quot;balance&quot;: 2000,
+  &quot;currency&quot;: &quot;USD&quot;
+}</pre></div><div class="call"><div class="hdr">POST http://134.209.211.10:4001/auth/v1/login → <span class="pass">200</span> · 226 ms</div><div class="lbl">Request</div><pre>{
+  &quot;phone&quot;: &quot;959491530&quot;,
+  &quot;pin&quot;: &quot;123456&quot;
+}</pre><div class="lbl">Response</div><pre>{
+  &quot;token&quot;: &quot;eyJhbGciOiJI…&quot;,
+  &quot;expiresIn&quot;: 3600,
+  &quot;user&quot;: {
+    &quot;id&quot;: &quot;u_1793234259834&quot;,
+    &quot;phone&quot;: &quot;959491530&quot;,
+    &quot;name&quot;: &quot;Receptor QA Karate&quot;,
+    &quot;email&quot;: &quot;receptor.959491530@qa.test&quot;,
+    &quot;pin&quot;: &quot;123456&quot;,
+    &quot;status&quot;: &quot;ACTIVE&quot;,
+    &quot;contacts&quot;: []
+  }
+}</pre></div><div class="call"><div class="hdr">GET http://134.209.211.10:4002/wallet/v1/balance → <span class="pass">200</span> · 212 ms</div><div class="lbl">Response</div><pre>{
+  &quot;balance&quot;: 2000,
+  &quot;currency&quot;: &quot;USD&quot;
+}</pre></div><h3 style="page-break-before:always">2. Escenario 2 - Transferencia del Emisor al Receptor por 450.00 <span class="badge ok">PASS</span></h3><p>Login del Emisor y captura del token Bearer; transferencia de 450.00 con nota "Pago de Servicios" → 200; tabla de aserción (status COMPLETED, mensaje, transactionId, referenceCode); saldo Emisor = saldo inicial − 450.00.</p><div class="call"><div class="hdr">POST http://134.209.211.10:4001/auth/v1/login → <span class="pass">200</span> · 229 ms</div><div class="lbl">Request</div><pre>{
+  &quot;phone&quot;: &quot;959477034&quot;,
+  &quot;pin&quot;: &quot;123456&quot;
+}</pre><div class="lbl">Response</div><pre>{
+  &quot;token&quot;: &quot;eyJhbGciOiJI…&quot;,
+  &quot;expiresIn&quot;: 3600,
+  &quot;user&quot;: {
+    &quot;id&quot;: &quot;u_1793234259588&quot;,
+    &quot;phone&quot;: &quot;959477034&quot;,
+    &quot;name&quot;: &quot;Emisor QA Karate&quot;,
+    &quot;email&quot;: &quot;emisor.959477034@qa.test&quot;,
+    &quot;pin&quot;: &quot;123456&quot;,
+    &quot;status&quot;: &quot;ACTIVE&quot;,
+    &quot;contacts&quot;: []
+  }
+}</pre></div><div class="call"><div class="hdr">POST http://134.209.211.10:4003/transaction/v1/transfer → <span class="pass">200</span> · 322 ms</div><div class="lbl">Request</div><pre>{
+  &quot;recipientId&quot;: &quot;u_1793234259834&quot;,
+  &quot;amount&quot;: 450,
+  &quot;description&quot;: &quot;Pago de Servicios&quot;,
+  &quot;categoryId&quot;: &quot;cat_tx&quot;
+}</pre><div class="lbl">Response</div><pre>{
+  &quot;transactionId&quot;: &quot;tx_1793234263209&quot;,
+  &quot;referenceCode&quot;: &quot;REF-449329&quot;,
+  &quot;status&quot;: &quot;COMPLETED&quot;,
+  &quot;message&quot;: &quot;Transferencia realizada con éxito&quot;
+}</pre></div><div class="call"><div class="hdr">GET http://134.209.211.10:4002/wallet/v1/balance → <span class="pass">200</span> · 218 ms</div><div class="lbl">Response</div><pre>{
+  &quot;balance&quot;: 1550,
+  &quot;currency&quot;: &quot;USD&quot;
+}</pre></div><h3 style="page-break-before:always">3. Escenario 3 - Validacion del saldo y del historial en el Receptor <span class="badge ok">PASS</span></h3><p>Login del Receptor; saldo = saldo inicial + 450.00; el historial contiene el código de la transacción como INCOME de 450.00 con la contraparte y la nota correctas.</p><div class="call"><div class="hdr">POST http://134.209.211.10:4001/auth/v1/login → <span class="pass">200</span> · 230 ms</div><div class="lbl">Request</div><pre>{
+  &quot;phone&quot;: &quot;959491530&quot;,
+  &quot;pin&quot;: &quot;123456&quot;
+}</pre><div class="lbl">Response</div><pre>{
+  &quot;token&quot;: &quot;eyJhbGciOiJI…&quot;,
+  &quot;expiresIn&quot;: 3600,
+  &quot;user&quot;: {
+    &quot;id&quot;: &quot;u_1793234259834&quot;,
+    &quot;phone&quot;: &quot;959491530&quot;,
+    &quot;name&quot;: &quot;Receptor QA Karate&quot;,
+    &quot;email&quot;: &quot;receptor.959491530@qa.test&quot;,
+    &quot;pin&quot;: &quot;123456&quot;,
+    &quot;status&quot;: &quot;ACTIVE&quot;,
+    &quot;contacts&quot;: []
+  }
+}</pre></div><div class="call"><div class="hdr">GET http://134.209.211.10:4002/wallet/v1/balance → <span class="pass">200</span> · 216 ms</div><div class="lbl">Response</div><pre>{
+  &quot;balance&quot;: 2450,
+  &quot;currency&quot;: &quot;USD&quot;
+}</pre></div><div class="call"><div class="hdr">GET http://134.209.211.10:4002/wallet/v1/transactions → <span class="pass">200</span> · 219 ms</div><div class="lbl">Response</div><pre>[
+  {
+    &quot;id&quot;: &quot;tx-1793234263180-31&quot;,
+    &quot;referenceCode&quot;: &quot;REF-449329&quot;,
+    &quot;type&quot;: &quot;INCOME&quot;,
+    &quot;amount&quot;: 450,
+    &quot;date&quot;: &quot;2026-10-29T00:37:43.180Z&quot;,
+    &quot;counterparty&quot;: &quot;Dinero Recibido&quot;,
+    &quot;counterpartyPhone&quot;: &quot;959477034&quot;,
+    &quot;description&quot;: &quot;De: 959477034. Pago de Servicios&quot;,
+    &quot;categoryId&quot;: &quot;cat_5&quot;,
+    &quot;categoryName&quot;: &quot;Sueldo&quot;
+  },
+  {
+    &quot;id&quot;: &quot;tx-1793234260802-403&quot;,
+    &quot;referenceCode&quot;: &quot;ADM-1793234260798&quot;,
+    &quot;type&quot;: &quot;INCOME&quot;,
+    &quot;amount&quot;: 2000,
+    &quot;date&quot;: &quot;2026-10-29T00:37:40.803Z&quot;,
+    &quot;counterparty&quot;: &quot;Dinero Recibido&quot;,
+    &quot;counterpartyPhone&quot;: &quot;ADMIN&quot;,
+    &quot;description&quot;: &quot;ADMIN ADJUSTMENT: Saldo inicial QA&quot;,
+    &quot;categoryId&quot;: &quot;cat_tx&quot;,
+    &quot;categoryName&quot;: &quot;Transferencia&quot;
+  }
+]</pre></div><h3 style="page-break-before:always">4. Login de administrador con credenciales validas e invalidas <span class="badge ok">PASS</span></h3><p>Login admin 200 (token Bearer, expiresIn 14400); credenciales inválidas → 401 AUTH_003.</p><div class="call"><div class="hdr">POST http://134.209.211.10:4004/admin/v1/login → <span class="pass">200</span> · 216 ms</div><div class="lbl">Request</div><pre>{
+  &quot;username&quot;: &quot;admin&quot;,
+  &quot;password&quot;: &quot;********&quot;
+}</pre><div class="lbl">Response</div><pre>{
+  &quot;token&quot;: &quot;eyJhbGciOiJI…&quot;,
+  &quot;type&quot;: &quot;Bearer&quot;,
+  &quot;expiresIn&quot;: 14400,
+  &quot;message&quot;: &quot;Usa este token en el Header &#x27;Authorization&#x27;&quot;
+}</pre></div><div class="call"><div class="hdr">POST http://134.209.211.10:4004/admin/v1/login → <span class="fail">401</span> · 216 ms</div><div class="lbl">Request</div><pre>{
+  &quot;username&quot;: &quot;admin&quot;,
+  &quot;password&quot;: &quot;********&quot;
+}</pre><div class="lbl">Response</div><pre>{
+  &quot;code&quot;: &quot;AUTH_003&quot;,
+  &quot;message&quot;: &quot;Invalid admin credentials&quot;
+}</pre></div><h3 style="page-break-before:always">5. El administrador valida la transaccion en la auditoria global <span class="badge ok">PASS</span></h3><p>La auditoría global contiene la referencia con 2 asientos: débito EXPENSE del Emisor y crédito INCOME del Receptor por 450.00.</p><div class="call"><div class="hdr">POST http://134.209.211.10:4004/admin/v1/login → <span class="pass">200</span> · 216 ms</div><div class="lbl">Request</div><pre>{
+  &quot;username&quot;: &quot;admin&quot;,
+  &quot;password&quot;: &quot;********&quot;
+}</pre><div class="lbl">Response</div><pre>{
+  &quot;token&quot;: &quot;eyJhbGciOiJI…&quot;,
+  &quot;type&quot;: &quot;Bearer&quot;,
+  &quot;expiresIn&quot;: 14400,
+  &quot;message&quot;: &quot;Usa este token en el Header &#x27;Authorization&#x27;&quot;
+}</pre></div><div class="call"><div class="hdr">GET http://134.209.211.10:4004/admin/v1/transactions → <span class="pass">200</span> · 1137 ms</div><div class="lbl">Response</div><pre>[
+  {
+    &quot;id&quot;: &quot;tx-1790119463453-881&quot;,
+    &quot;referenceCode&quot;: &quot;ADM-1790119463445&quot;,
+    &quot;type&quot;: &quot;INCOME&quot;,
+    &quot;amount&quot;: 1000,
+    &quot;date&quot;: &quot;2026-09-22T23:24:23.453Z&quot;,
+    &quot;counterparty&quot;: &quot;Dinero Recibido&quot;,
+    &quot;counterpartyPhone&quot;: &quot;ADMIN&quot;,
+    &quot;description&quot;: &quot;ADMIN ADJUSTMENT: Bono&quot;,
+    &quot;categoryId&quot;: &quot;cat_tx&quot;,
+    &quot;categoryName&quot;: &quot;Transferencia&quot;,
+    &quot;userId&quot;: &quot;u1&quot;
+  },
+  {
+    &quot;id&quot;: &quot;dep-1785210786064&quot;,
+    &quot;referenceCode&quot;: &quot;DEP-1785210786064&quot;,
+    &quot;type&quot;: &quot;INCOME&quot;,
+    &quot;amount&quot;: 500,
+    &quot;date&quot;: &quot;2026-07-28T03:53:06.064Z&quot;,
+    &quot;counterparty&quot;: &quot;Recarga Bancaria&quot;,
+    &quot;counterpartyPhone&quot;: &quot;BANCO&quot;,
+    &quot;description&quot;: &quot;Carga de saldo manual&quot;,
+    &quot;categoryId&quot;: &quot;cat_inc_1&quot;,
+    &quot;categoryName&quot;: &quot;Sueldo&quot;,
+    &quot;userId&quot;: &quot;u1&quot;
+  }
+]
+… (3410 elementos en total)</pre></div><h3 style="page-break-before:always">6. El administrador confirma los saldos finales de Emisor y Receptor <span class="badge ok">PASS</span></h3><p>GET /admin/v1/users: Emisor y Receptor ACTIVE con los saldos finales esperados.</p><div class="call"><div class="hdr">POST http://134.209.211.10:4004/admin/v1/login → <span class="pass">200</span> · 214 ms</div><div class="lbl">Request</div><pre>{
+  &quot;username&quot;: &quot;admin&quot;,
+  &quot;password&quot;: &quot;********&quot;
+}</pre><div class="lbl">Response</div><pre>{
+  &quot;token&quot;: &quot;eyJhbGciOiJI…&quot;,
+  &quot;type&quot;: &quot;Bearer&quot;,
+  &quot;expiresIn&quot;: 14400,
+  &quot;message&quot;: &quot;Usa este token en el Header &#x27;Authorization&#x27;&quot;
+}</pre></div><div class="call"><div class="hdr">GET http://134.209.211.10:4004/admin/v1/users → <span class="pass">200</span> · 7336 ms</div><div class="lbl">Response</div><pre>[
+  {
+    &quot;id&quot;: &quot;u1&quot;,
+    &quot;phone&quot;: &quot;999888777&quot;,
+    &quot;name&quot;: &quot;Deyvi Emisor&quot;,
+    &quot;email&quot;: &quot;derojas@test.com&quot;,
+    &quot;pin&quot;: &quot;123456&quot;,
+    &quot;status&quot;: &quot;DELETED&quot;,
+    &quot;contacts&quot;: [
+      &quot;u2&quot;,
+      &quot;u_1785206408042&quot;
+    ],
+    &quot;balance&quot;: 1.0000104105245205e+25
+  },
+  {
+    &quot;id&quot;: &quot;u2&quot;,
+    &quot;phone&quot;: &quot;666555444&quot;,
+    &quot;name&quot;: &quot;Beto Builder&quot;,
+    &quot;email&quot;: &quot;beto@wallet.com&quot;,
+    &quot;pin&quot;: &quot;123456&quot;,
+    &quot;status&quot;: &quot;ACTIVE&quot;,
+    &quot;contacts&quot;: [],
+    &quot;balance&quot;: 3407
+  }
+]
+… (3648 elementos en total)</pre></div><h3 style="page-break-before:always">7. Acceso a la auditoria sin permisos de administrador - sin token <span class="badge ok">PASS</span></h3><p>Sin token → 401 ADM_001.</p><div class="call"><div class="hdr">POST http://134.209.211.10:4001/auth/v1/login → <span class="pass">200</span> · 214 ms</div><div class="lbl">Request</div><pre>{
+  &quot;phone&quot;: &quot;959477034&quot;,
+  &quot;pin&quot;: &quot;123456&quot;
+}</pre><div class="lbl">Response</div><pre>{
+  &quot;token&quot;: &quot;eyJhbGciOiJI…&quot;,
+  &quot;expiresIn&quot;: 3600,
+  &quot;user&quot;: {
+    &quot;id&quot;: &quot;u_1793234259588&quot;,
+    &quot;phone&quot;: &quot;959477034&quot;,
+    &quot;name&quot;: &quot;Emisor QA Karate&quot;,
+    &quot;email&quot;: &quot;emisor.959477034@qa.test&quot;,
+    &quot;pin&quot;: &quot;123456&quot;,
+    &quot;status&quot;: &quot;ACTIVE&quot;,
+    &quot;contacts&quot;: []
+  }
+}</pre></div><div class="call"><div class="hdr">GET http://134.209.211.10:4004/admin/v1/transactions → <span class="fail">401</span> · 210 ms</div><div class="lbl">Response</div><pre>{
+  &quot;code&quot;: &quot;ADM_001&quot;,
+  &quot;message&quot;: &quot;Admin token missing&quot;
+}</pre></div><h3 style="page-break-before:always">8. Acceso a la auditoria sin permisos de administrador - token de usuario sin rol <span class="badge ok">PASS</span></h3><p>Token de usuario sin rol admin → 403 ADM_002.</p><div class="call"><div class="hdr">POST http://134.209.211.10:4001/auth/v1/login → <span class="pass">200</span> · 216 ms</div><div class="lbl">Request</div><pre>{
+  &quot;phone&quot;: &quot;959477034&quot;,
+  &quot;pin&quot;: &quot;123456&quot;
+}</pre><div class="lbl">Response</div><pre>{
+  &quot;token&quot;: &quot;eyJhbGciOiJI…&quot;,
+  &quot;expiresIn&quot;: 3600,
+  &quot;user&quot;: {
+    &quot;id&quot;: &quot;u_1793234259588&quot;,
+    &quot;phone&quot;: &quot;959477034&quot;,
+    &quot;name&quot;: &quot;Emisor QA Karate&quot;,
+    &quot;email&quot;: &quot;emisor.959477034@qa.test&quot;,
+    &quot;pin&quot;: &quot;123456&quot;,
+    &quot;status&quot;: &quot;ACTIVE&quot;,
+    &quot;contacts&quot;: []
+  }
+}</pre></div><div class="call"><div class="hdr">GET http://134.209.211.10:4004/admin/v1/transactions → <span class="fail">403</span> · 211 ms</div><div class="lbl">Response</div><pre>{
+  &quot;code&quot;: &quot;ADM_002&quot;,
+  &quot;message&quot;: &quot;Unauthorized admin access&quot;
+}</pre></div><h3 style="page-break-before:always">Reporte de Karate – regression.feature</h3><img src="evidencias/02-regression-feature.png" alt="regression.feature"><h3 style="page-break-before:always">Reporte de Karate – admin.feature</h3><img src="evidencias/03-admin-feature.png" alt="admin.feature"><h2 style="page-break-before:always">4. Hallazgos</h2><table><tr><th>ID</th><th>Severidad</th><th>Endpoint</th><th>Descripción</th><th>Recomendación</th></tr><tr><td>H-01</td><td class="sev-Media">Media</td><td><code>POST /transaction/v1/transfer · GET /wallet/v1/transactions</code></td><td>El <b>transactionId</b> devuelto por la transferencia no aparece en el historial; los movimientos tienen otros IDs (<code>tx-&lt;timestamp&gt;-&lt;n&gt;</code>). El único dato común es <b>referenceCode</b>.</td><td>Persistir el transactionId en ambos asientos o documentar referenceCode como identificador oficial. La suite valida la trazabilidad por referenceCode.</td></tr><tr><td>H-02</td><td class="sev-Alta">Alta</td><td><code>POST /auth/v1/register · POST /auth/v1/login · GET /admin/v1/users</code></td><td>Las respuestas exponen el <b>PIN en texto plano</b> (<code>"pin":"123456"</code>).</td><td>No devolver el PIN en ninguna respuesta y almacenarlo con hash.</td></tr><tr><td>H-03</td><td class="sev-Alta">Alta</td><td><code>POST /admin/v1/balance</code></td><td>El ajuste de saldo no tiene límites: en el entorno existen usuarios con saldo <code>1.0e+72</code> y <code>-1.0e+72</code> (montos desmesurados y saldos negativos).</td><td>Validar el rango del monto y no permitir saldo final negativo.</td></tr><tr><td>H-04</td><td class="sev-Media">Media</td><td><code>POST /auth/v1/register</code></td><td>No se valida el formato del teléfono ni del email: hay usuarios con teléfono <code>ASDASDASD</code>, <code>123</code> o de 16 dígitos, y emails como <code>9191com</code>.</td><td>Validar teléfono (9 dígitos numéricos) y email en el backend y responder 400.</td></tr><tr><td>H-05</td><td class="sev-Baja">Baja</td><td><code>PUT /admin/v1/users/:id</code></td><td>Se aceptan estados fuera del catálogo (<code>ACTIVEeeee</code>).</td><td>Restringir status a ACTIVE / DELETED.</td></tr><tr><td>H-06</td><td class="sev-Baja">Baja</td><td><code>POST /admin/v1/login</code></td><td>La documentación indica que el Admin Service solo acepta <code>x-channel: ADMIN</code>, pero el login responde 200 también con <code>x-channel: WEB</code>.</td><td>Rechazar con 400 GEN_001 los canales distintos de ADMIN.</td></tr></table><p><i>H-03, H-04 y H-05 se observaron en datos del entorno compartido creados por otras ejecuciones; demuestran que la API aceptó esos valores.</i></p><h2>5. Conclusiones</h2><ol>
+<li>El flujo principal de la billetera <b>cumple</b> lo esperado: 8 de 8 escenarios aprobados. Los
+saldos cuadran exactamente (−450.00 en el Emisor, +450.00 en el Receptor) y la operación queda registrada
+con doble asiento en la auditoría del administrador.</li>
+<li>Los controles funcionan: registro duplicado → 409 AUTH_006; Admin sin token → 401 ADM_001; Admin con token de
+usuario → 403 ADM_002; credenciales de admin inválidas → 401 AUTH_003.</li>
+<li>La trazabilidad de la transferencia depende de <b>referenceCode</b>, porque el transactionId devuelto no aparece
+en el historial (H-01).</li>
+<li>Existen riesgos de <b>seguridad</b> (PIN expuesto, H-02) y de <b>integridad de datos</b> (montos y formatos sin
+validar, H-03 a H-05) que deben corregirse antes de pasar a producción.</li>
+<li>La suite es repetible: genera usuarios con teléfonos únicos en cada corrida, no depende de datos previos y se
+ejecuta con <code>mvn clean test</code> en unos 19 segundos.</li>
+</ol>
+<p><b>Próximos pasos sugeridos:</b> casos negativos de transferencia (saldo insuficiente WALL_001, límite diario
+WALL_002, destinatario inexistente TRX_002, autotransferencia TRX_001), integración en CI y ejecución sobre un
+entorno con datos aislados.</p>
+<p style="margin-top:30px;color:#64748b;font-size:8.5pt">Informe generado el 28/10/2026 19:39
+a partir de <code>target/karate-reports</code>.</p>
+</body></html>
