@@ -24,7 +24,6 @@ DOCS = ROOT / "docs"
 EVIDENCIAS = DOCS / "evidencias"
 
 AUTOR = "Jonathan Castañeda"
-ROL = "QA Automation Engineer"
 SALDO_ASIGNADO = 2000.00
 MONTO = 450.00
 
@@ -386,7 +385,7 @@ code {{ background: #f1f5f9; padding: 0 3px; border-radius: 3px; font-size: 8.8p
 <tr><td>Modo de ejecución</td><td>Secuencial, {summary.get('threads', 1)} hilo (parallel(1))</td></tr>
 <tr><td>Entorno</td><td>{esc(summary.get('env', ''))}</td></tr>
 <tr><td>Fecha de ejecución</td><td>{esc(fecha_ejec)}</td></tr>
-<tr><td>Elaborado por</td><td>{esc(AUTOR)} – {esc(ROL)}</td></tr>
+<tr><td>Elaborado por</td><td>{esc(AUTOR)}</td></tr>
 <tr><td>Resultado</td><td><span class="badge {'ok' if fallidos == 0 else 'ko'}">{estado_global}</span></td></tr>
 </table></section>""")
 
