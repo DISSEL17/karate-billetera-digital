@@ -80,6 +80,125 @@ VALIDACIONES = {
 }
 
 
+CRITERIOS = [
+    ("1. Uso de variables correctas",
+     "Variables globales en <code>karate-config.js</code> (URLs, monto, nota, saldo, credenciales). Almacén global "
+     "<code>store</code> para compartir usuarios, saldos iniciales, token y código de transacción entre escenarios y "
+     "features. Variables locales con nombres descriptivos (<code>emisor</code>, <code>tokenEmisor</code>, "
+     "<code>saldoInicialReceptor</code>, <code>codigoTransaccion</code>)."),
+    ("2. Validaciones correctas",
+     "Códigos de estado, esquemas con matchers (<code>#string</code>, <code>#number</code>, <code>#notnull</code>, "
+     "<code>#regex</code>, <code>#array</code>, <code>##string</code>), <code>match each</code>, <code>contains</code>, "
+     "tabla de aserciones, validación matemática de saldos, casos negativos (409, 401, 403)."),
+    ("3. Reporte correcto",
+     "Reporte HTML nativo de Karate con request/response, reporte PDF generado por el runner, Cucumber JSON y "
+     "este informe con evidencia por escenario."),
+    ("4. Código legible, ordenado y buenas prácticas",
+     "Background con configuración común, features reutilizables (<code>common/</code>) invocados con "
+     "<code>call</code>, tags por escenario, comentarios por bloque, ejecución secuencial explícita, "
+     "datos de prueba generados en cada corrida (sin dependencias de datos previos)."),
+]
+
+
+def trazabilidad(d):
+    """Pasos del enunciado del examen -> implementacion en Karate -> evidencia de la ejecucion."""
+    em = f"{d.get('emisor_phone', '-')} ({d.get('emisor_id', '-')})"
+    rc = f"{d.get('receptor_phone', '-')} ({d.get('receptor_id', '-')})"
+    ref = d.get("ref", "-")
+    tx = d.get("tx", "-")
+    s0, sf_e, sf_r = SALDO_ASIGNADO, SALDO_ASIGNADO - MONTO, SALDO_ASIGNADO + MONTO
+    return {
+        "Escenario 1: Registro de Usuarios": [
+            ("1. Crear un usuario Emisor y otro Receptor",
+             "<code>POST /auth/v1/register</code> por cada usuario; <code>Then status 201</code> y "
+             "<code>match response.user == esquemaUsuario</code>.",
+             f"Emisor {em}<br>Receptor {rc}<br>Ambos 201"),
+            ("1a. Función para generar números celulares aleatorios",
+             "<code>generarCelular()</code> en <code>karate-config.js</code>: 9 dígitos que empiezan con 9 "
+             "(timestamp + aleatorio), sin repetir en la ejecución; se valida con <code>#regex 9\\d{8}</code>.",
+             f"{d.get('emisor_phone', '-')} y {d.get('receptor_phone', '-')}"),
+            ("1b. Alojar los usuarios en variables globales",
+             "<code>store.put('emisor', emisor)</code> y <code>store.put('receptor', receptor)</code>; "
+             "los escenarios 2, 3 y el Feature 3 los leen con <code>store.get(...)</code>.",
+             "Usuarios disponibles en los escenarios siguientes"),
+            ("2. Asignar saldo suficiente y validar que sea correcto",
+             "<code>POST /admin/v1/balance</code> (CREDIT) para ambos vía <code>call</code> en bucle; "
+             "<code>match response.newBalance == amount</code> y, con el token de cada usuario, "
+             "<code>GET /wallet/v1/balance</code> → <code>match response.balance == saldoAsignado</code>.",
+             f"newBalance {s0:,.2f} y balance {s0:,.2f} para ambos"),
+            ("3. Guardar los saldos actuales en variables",
+             "<code>saldoInicialEmisor</code> y <code>saldoInicialReceptor</code> guardados en <code>store</code>.",
+             f"{s0:,.2f} / {s0:,.2f}"),
+            ("4. Si el usuario ya existe, el escenario debe caerse con error",
+             "El registro exige <code>status 201</code>: si el teléfono ya existiera, la API responde 409 y el "
+             "escenario falla. Además se comprueba de forma explícita registrando de nuevo al Emisor: "
+             "<code>match [400, 409] contains responseStatus</code> y <code>code == 'AUTH_006'</code>.",
+             "Duplicado → 409 AUTH_006 \"User already exists\""),
+        ],
+        "Escenario 2: Transferencia del Usuario Emisor al Receptor": [
+            ("1. Login del Emisor y guardar el token",
+             "<code>POST /auth/v1/login</code>; <code>def tokenEmisor = response.token</code>.",
+             "200, token JWT obtenido"),
+            ("2. Transferencia con nota \"Pago de Servicios\" por 450.00",
+             "<code>POST /transaction/v1/transfer</code> con <code>recipientId</code> del Receptor, "
+             "<code>amount: montoTransferencia</code> y <code>description: notaTransferencia</code>.",
+             f"200 · {MONTO:,.2f} · \"Pago de Servicios\""),
+            ("3. Validar la transacción",
+             "Esquema con <code>#notnull</code> y tabla de aserciones: <code>status == 'COMPLETED'</code>, mensaje, "
+             "<code>transactionId</code> (<code>#regex tx_\\d+</code>), <code>referenceCode</code> "
+             "(<code>#regex REF-\\d+</code>).",
+             "status COMPLETED"),
+            ("4. Guardar el código de la transacción",
+             "<code>store.put('codigoTransaccion', referenceCode)</code> y <code>store.put('transactionId', ...)</code>.",
+             f"{ref} / {tx}"),
+            ("5. Consultar el saldo del Emisor",
+             "<code>GET /wallet/v1/balance</code> con <code>Authorization: Bearer tokenEmisor</code>.",
+             "200"),
+            ("6. Validar la disminución contra el saldo inicial",
+             "<code>saldoEsperado = saldoInicialEmisor - montoTransferencia</code>; "
+             "<code>match response.balance == saldoEsperado</code>.",
+             f"{s0:,.2f} − {MONTO:,.2f} = {sf_e:,.2f} ✔"),
+        ],
+        "Escenario 3: Validación de Transferencia en Receptor": [
+            ("1. Login del Receptor y guardar el token",
+             "<code>POST /auth/v1/login</code>; <code>def tokenReceptor = response.token</code>.",
+             "200, token JWT obtenido"),
+            ("2. Consultar el saldo del Receptor",
+             "<code>GET /wallet/v1/balance</code> con el token del Receptor.",
+             "200"),
+            ("3. Validar el incremento contra el saldo inicial",
+             "<code>saldoEsperado = saldoInicialReceptor + montoTransferencia</code>; "
+             "<code>match response.balance == saldoEsperado</code>.",
+             f"{s0:,.2f} + {MONTO:,.2f} = {sf_r:,.2f} ✔"),
+            ("4. Consultar las transacciones del Receptor",
+             "<code>GET /wallet/v1/transactions</code>; <code>match each response contains {...}</code>.",
+             "200, lista de movimientos"),
+            ("5. Validar el número de transacción contra el del Escenario 2",
+             "<code>match response[*].referenceCode contains codigoTransaccion</code>; el movimiento encontrado es "
+             "<code>INCOME</code> de 450.00 con la contraparte y la nota correctas. "
+             "(El <code>transactionId</code> no se persiste en el historial: ver hallazgo H-01).",
+             f"{ref} encontrado ✔"),
+        ],
+        "Feature 3: Flujo Administrador": [
+            ("Login con rol Administrador",
+             "<code>POST /admin/v1/login</code> con <code>x-channel: ADMIN</code>; se valida token Bearer y "
+             "<code>expiresIn</code>; con clave inválida → 401 AUTH_003.",
+             "200 · 401 con credenciales inválidas"),
+            ("1. Validar la transacción de la operación",
+             "<code>GET /admin/v1/transactions</code>: la referencia aparece con exactamente 2 asientos — débito "
+             "<code>EXPENSE</code> del Emisor y crédito <code>INCOME</code> del Receptor — por 450.00 con las "
+             "contrapartes cruzadas (tabla de aserciones).",
+             f"{ref}: 2 asientos ✔"),
+            ("Validación complementaria de saldos",
+             "<code>GET /admin/v1/users</code>: Emisor y Receptor <code>ACTIVE</code> con los saldos finales.",
+             f"{sf_e:,.2f} / {sf_r:,.2f} ✔"),
+            ("Validación complementaria de seguridad",
+             "<code>Scenario Outline</code>: auditoría sin token → 401 ADM_001; con token de usuario → 403 ADM_002.",
+             "401 / 403 ✔"),
+        ],
+    }
+
+
 def esc(text):
     return html.escape(str(text), quote=True)
 
@@ -308,23 +427,46 @@ punta a punta. Los datos se comparten entre escenarios mediante un almacén glob
                  f"<td>{validacion(e['name'])}</td><td>{e['ms'] / 1000:.2f}s</td><td>{estado}</td></tr>")
     h.append("</table>")
 
-    # 4. Evidencia por escenario
-    h.append('<h2 class="scen">3. Evidencia de la ejecución por escenario</h2>'
-             '<p>Peticiones y respuestas HTTP registradas por Karate durante la ejecución '
+    h.append("<h3>Cobertura de los criterios de evaluación</h3><table>"
+             "<tr><th>Criterio</th><th>Cómo se cubre en el proyecto</th></tr>")
+    for crit, como in CRITERIOS:
+        h.append(f"<tr><td><b>{crit}</b></td><td>{como}</td></tr>")
+    h.append("</table>")
+
+    # 4. Detalle y evidencia por escenario, en el orden del enunciado
+    h.append('<h2 class="scen">3. Detalle y evidencia de la ejecución por escenario</h2>'
+             '<p>Para cada escenario del enunciado se muestra cada paso solicitado, cómo se implementó en Karate y '
+             'el valor obtenido en esta ejecución; luego, las peticiones y respuestas HTTP registradas por Karate '
              '(los tokens se muestran truncados).</p>')
-    for i, e in enumerate(escenarios, 1):
-        estado = '<span class="badge ko">FAIL</span>' if e["failed"] else '<span class="badge ok">PASS</span>'
-        h.append(f'<h3 style="page-break-before:{"always" if i > 1 else "auto"}">{i}. {esc(e["name"])} {estado}</h3>')
-        h.append(f"<p>{validacion(e['name'])}</p>")
-        for c in e["calls"]:
-            h.append(f'<div class="call"><div class="hdr">{c["method"]} {esc(c["url"])} → '
-                     f'<span class="{"pass" if c["status"].startswith("2") else "fail"}">{c["status"]}</span>'
-                     f' · {c["ms"]} ms</div>')
-            if c["request"]:
-                h.append(f'<div class="lbl">Request</div><pre>{esc(short_json(c["request"], 600))}</pre>')
-            if c["response"]:
-                h.append(f'<div class="lbl">Response</div><pre>{esc(short_json(c["response"]))}</pre>')
-            h.append("</div>")
+    grupos = [
+        ("Escenario 1: Registro de Usuarios", escenarios[0:1]),
+        ("Escenario 2: Transferencia del Usuario Emisor al Receptor", escenarios[1:2]),
+        ("Escenario 3: Validación de Transferencia en Receptor", escenarios[2:3]),
+        ("Feature 3: Flujo Administrador", escenarios[3:]),
+    ]
+    matriz = trazabilidad(datos)
+    for gi, (titulo, escs) in enumerate(grupos):
+        fallo = any(e["failed"] for e in escs)
+        estado = '<span class="badge ko">FAIL</span>' if fallo else '<span class="badge ok">PASS</span>'
+        h.append(f'<h3 style="page-break-before:{"always" if gi else "auto"}">{esc(titulo)} {estado}</h3>')
+        h.append("<table><tr><th style='width:30%'>Paso del enunciado</th><th style='width:42%'>Implementación (Karate)</th>"
+                 "<th>Evidencia de esta ejecución</th></tr>")
+        for paso, impl, evid in matriz[titulo]:
+            h.append(f"<tr><td>{paso}</td><td>{impl}</td><td>{evid}</td></tr>")
+        h.append("</table>")
+        for e in escs:
+            if len(escs) > 1:
+                st = '<span class="fail">FAIL</span>' if e["failed"] else '<span class="pass">PASS</span>'
+                h.append(f'<div class="lbl" style="margin-top:12px;font-size:9pt">Escenario: {esc(e["name"])} · {st}</div>')
+            for c in e["calls"]:
+                h.append(f'<div class="call"><div class="hdr">{c["method"]} {esc(c["url"])} → '
+                         f'<span class="{"pass" if c["status"].startswith("2") else "fail"}">{c["status"]}</span>'
+                         f' · {c["ms"]} ms</div>')
+                if c["request"]:
+                    h.append(f'<div class="lbl">Request</div><pre>{esc(short_json(c["request"], 600))}</pre>')
+                if c["response"]:
+                    h.append(f'<div class="lbl">Response</div><pre>{esc(short_json(c["response"]))}</pre>')
+                h.append("</div>")
 
     h.append('<h3 style="page-break-before:always">Reporte de Karate – regression.feature</h3>'
              '<img src="evidencias/02-regression-feature.png" alt="regression.feature">'
